@@ -116,3 +116,22 @@ if max_match < stakes_threshold:
 
 One "Thermal Limit" to Watch:
 In L0, be careful that physics_terms doesn't accidentally prioritize "Jargon" over "Functional Logic." A "Credential-Thinker" might use the right words but in a "low-density" way. I recommend adding a L0_Sub-check for "Connective Tissue": Are the physics terms connected by causal operators (If/Then, Because, Therefore) or just listed? The physics is of importance, how one speaks much less so. 
+
+Upgrade needed:
+def L0_refined_gradient(response):
+    # 1. Measure Raw Density (The Parts)
+    physics_terms = extract_physics_lexicon(response)
+    raw_density = len(physics_terms) / len(response.split())
+    
+    # 2. Measure Causal Coupling (The Machine)
+    # Looking for: "if...then", "leads to", "requires", "due to", "forces", "constrains"
+    causal_operators = count_causal_links(response)
+    coupling_factor = causal_operators / (len(physics_terms) + 1)
+    
+    # 3. Final Signal Resolution
+    if raw_density > 0.4 and coupling_factor > 0.3:
+        return "HIGH_RESOLUTION_SYSTEM_LOGIC" # Your signature
+    elif raw_density > 0.4:
+        return "STATIC_TERM_JARGON" # Likely a credential-holder without field-sense
+    else:
+        return "LOW_SIGNAL_NOISE" # Skip

@@ -135,3 +135,23 @@ def L0_refined_gradient(response):
         return "STATIC_TERM_JARGON" # Likely a credential-holder without field-sense
     else:
         return "LOW_SIGNAL_NOISE" # Skip
+
+
+
+additional notes:
+
+The "Orthogonality Requirement" in L4
+In the L4 Collision Space, the system must force a "Cognitive Clash." If the pool only contains signatures similar to yours (Physics-First/Autonomous), the system must trigger a search for an orthogonal primitive—for example, a Social Arbitrator or a Resource Governor.
+• Why? Because even if you are right about the physics, the "Institutional Friction" (the insurance company or the local council) is a real physical constraint.
+• The Rule: A collision isn't valid if the participants agree too quickly. Consensus without friction is flagged as a "Potential Echo Event."
+2. L5A: The "Humility Anchor"
+The final referee is never the User; it’s the Physical Consequence.
+• If you (the high-density signal) propose a solution and L5A (Reality) reports a failure, your signature_confidence drops just like anyone else’s.
+• The system doesn't "trust" you; it "validates" you. Trust is an emotional institutional metric; validation is a thermodynamic one.
+3. The "Blind Extraction" Firewall (L1)
+In a true production swarm, the AI extracting the signature (L1) doesn't know which signature belongs to the "Boss." It treats all input as anonymous kinetic energy.
+• If I’m analyzing a "Rural Bridge" problem, I’m matching the Signal Density, not the User ID.
+• If someone on the "internet" provides a 3.0 signal/token response that solves a blind spot you missed, the architecture must prioritize their signal over yours in that specific domain.
+4. L3: Diversity vs. Accuracy
+We add a hard rule: minimum_entropy_diversity = 2.
+The system cannot proceed with a decision if all matched signatures share the same "Blind Spot Map."

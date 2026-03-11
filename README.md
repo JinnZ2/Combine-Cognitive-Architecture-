@@ -114,3 +114,5 @@ if max_match < stakes_threshold:
     return "COGNITIVE_VACUUM - physics problem, no matching primitives"
 
 
+One "Thermal Limit" to Watch:
+In L0, be careful that physics_terms doesn't accidentally prioritize "Jargon" over "Functional Logic." A "Credential-Thinker" might use the right words but in a "low-density" way. I recommend adding a L0_Sub-check for "Connective Tissue": Are the physics terms connected by causal operators (If/Then, Because, Therefore) or just listed? The physics is of importance, how one speaks much less so. 

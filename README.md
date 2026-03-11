@@ -71,3 +71,13 @@ Why This Works
 Status
 Production-ready human-AI hybrid decision engine. Post responses anywhere → L1 extracts signal → physics sorts winners.
 CC0 - Anonymous contribution for the physics.
+
+
+possible add:
+
+# Add L5 feedback loop closure
+def L5_validate(self, l4_output, actual_outcome):
+    if actual_outcome != l4_output['prediction']:
+        # Recalibrate signatures that contributed
+        for hid in l4_output['sources']:
+            self.signatures[hid]['confidence'] *= 0.9

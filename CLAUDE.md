@@ -624,6 +624,419 @@ recalibration = registry.consequence_feedback(consequence)
 # Physics won. Not consensus. The cold chain told us what's true.
 ```
 
+### Example 6: sim.py walkthrough — Bridge failure demo
+
+`sim.py` is the simplest runnable entry point. It shows L1→L3 in ~70 lines with hardcoded responses standing in for real behavioral observation.
+
+```python
+# sim.py creates a CognitiveArchitecture instance and runs simulate_bridge_test()
+# Six people respond to a bridge problem. L1 extracts blind signatures from keywords.
+
+arch = CognitiveArchitecture()
+arch.simulate_bridge_test()
+
+# What happens internally:
+# 1. L1_extract() scores each response on 5 boolean signals:
+#    constraint_coupler, self_reeval, felt_absence, social_arbit, pattern_match
+#    e.g. "1962 steel×salt×harmonics? why funding barrier?" → 0.80 (4/5 signals)
+#    e.g. "check beams, joints ok" → 0.20 (1/5 signals)
+#
+# 2. L2_decompose() returns static constraint geometry:
+#    needs=['physics','social','history','reeval'], stakes='bridge collapse fatal'
+#
+# 3. L3_match() filters: confidence > 0.6 AND coverage > 0.7
+#    Returns top 3 diverse matches — not a ranked list of "best" people
+#
+# 4. L4 is narrated (not computed): the matched pieces collide →
+#    emergent protocol: CLOSE BRIDGE + INSURANCE MOU + PHYSICS REDESIGN
+#
+# Key pattern: sim.py is a toy. The real layers in spine/ replace each step
+# with full implementations. But the FLOW is the same:
+#   behavior → signature → constraint geometry → probability field → collision → consequence
+```
+
+### Example 7: Seeding the L2 partial solution library
+
+`l2_constraint_geometry.py` contains `PartialSolutionLibrary` which seeds real-world pieces on init. Here's how to add a new partial solution using constraint geometry language.
+
+```python
+from spine.l2_constraint_geometry import (
+    PartialSolution, PartialSolutionLibrary, ConstraintNode,
+    RecombinationInterface, InterfaceType, SolutionOrigin
+)
+
+library = PartialSolutionLibrary()
+# Library auto-seeds with thermal_mass_spike_absorption and
+# embodied_apprenticeship_transmission on init
+
+# Add a new piece — LoRa mesh monitoring
+# Note: describe what it DOES geometrically, not what domain it's from
+lora_mesh = PartialSolution(
+    name="resilient_mesh_communication",
+    solves_geometry="distributed_monitoring_without_central_infrastructure",
+    solves_constraints=[
+        ConstraintNode(
+            constraint_description="monitoring_requires_grid",
+            pure_geometry="centralized_dependency_single_point_failure",
+            dynamics=["mesh_self_heals", "no_central_node"],
+            failure_mode="node_density_below_threshold"
+        )
+    ],
+    doesnt_solve=[
+        "cannot_interpret_sensor_data",
+        "cannot_make_human_decisions",
+        "requires_physical_node_placement"
+    ],
+    interfaces=[
+        RecombinationInterface(
+            interface_type=InterfaceType.COMPLEMENTARY,
+            negative_space=[
+                "needs_physical_infrastructure_to_monitor",
+                "needs_human_protocol_for_response"
+            ],
+            complementary_requirements=[
+                "thermal_mass_or_other_physical_system",
+                "human_decision_protocol_layer"
+            ],
+            scale_micro="single_sensor_node",
+            scale_meso="facility_monitoring_mesh",
+            scale_macro="corridor_wide_sensor_network"
+        )
+    ],
+    origin=SolutionOrigin.ADJACENT_DOMAIN,
+    origin_domain="IoT_sensor_networks",
+    origin_context="agricultural_remote_monitoring",
+    held_by_cognitive_mode=["spatial_geometric", "pattern_isomorphic"],
+    evidence_of_working=["agricultural_deployments_5yr_track_record"]
+)
+
+library.add_solution(lora_mesh)
+
+# Search by geometry, not domain
+matches = library.search_by_geometry("single_point_failure")
+
+# Find what fits with the thermal mass piece
+thermal = list(library.solutions.values())[0]  # thermal_mass_spike_absorption
+candidates = library.find_recombination_candidates(thermal, threshold=0.3)
+# Returns [(solution, fit_score), ...] — ranked by interface compatibility
+```
+
+### Example 8: DeepSeek ML pipeline — from training data to extraction
+
+The `Odd/DeepSeek/` directory contains three stages of the ML extraction pipeline.
+
+```python
+# Stage 1: training-set.json generates synthetic training data
+# CognitiveSignatureDatasetGenerator uses templates + vocabulary to produce
+# labeled examples for 5 cognitive styles + mixed:
+#   constraint_coupler, felt_absence, pattern_match, social_arbit, monoculture
+
+# Templates are filled with domain vocabulary:
+# "The {domain1} of {phenomenon} despite {domain2} constraints"
+# → "The physics of bridge failure despite regulatory constraints"
+# Label: constraint_coupler
+
+# Stage 2: L1.py — regex-based extraction (production baseline)
+# CognitiveSignatureAPI defines pattern dictionaries per mode:
+#   constraint_coupler: r'(\w+)×(\w+)×(\w+)', weight=0.35
+#   felt_absence:       r'something (feel|feels) (wrong|off|missing)', weight=0.28
+#   pattern_match:      r'(reminds|like) (me|us) of \d{4}', weight=0.22
+#   social_arbit:       r'(council|board|committee|regulator)', weight=0.15
+
+# Anti-patterns prevent false positives:
+#   "physics textbook" doesn't count as constraint_coupler
+#   "I feel great" doesn't count as felt_absence
+
+# Output includes CDI (Cognitive Diversity Index):
+#   CDI = count(modes_scoring_above_0.3) / total_modes
+
+# Stage 3: Hugging-face.py — fine-tuned BERT on Gradio
+# Takes the training data from Stage 1, fine-tunes a BERT model,
+# deploys as a Gradio web interface for real-time extraction.
+# This is where L1's "needs ML extraction model" gap gets addressed.
+
+# The pipeline progression:
+#   Regex (L1.py) → good enough for demos, catches obvious patterns
+#   BERT (Hugging-face.py) → catches subtle signals regex misses
+#   Neither replaces behavioral observation — both are approximations
+```
+
+### Example 9: Anti-patterns — what NOT to build
+
+These patterns violate core architectural invariants. They look reasonable but break the system.
+
+```python
+# ANTI-PATTERN 1: Credential-based filtering
+# WRONG — this is the exact failure mode the architecture exists to prevent
+def match_to_problem_wrong(problem, candidates):
+    return [c for c in candidates if c.degree == "PhD"
+            and c.field == problem.domain]
+# RIGHT — match by cognitive geometry, not credentials
+def match_to_problem_right(problem, signatures):
+    return [s for s in signatures
+            if geometry_fit(s.cognitive_mode, problem.constraint_geometry) > 0.7]
+
+# ANTI-PATTERN 2: Collapsing consent to a boolean
+# WRONG — consent is an 8-state machine, not a checkbox
+class UserWrong:
+    consented: bool = False  # This loses the entire state machine
+# RIGHT — use the ConsentFlowOrchestrator with all 8 states:
+#   INITIAL → EXTRACTING → PENDING_DISCLOSURE → DISCLOSED →
+#   CORRECTING → CONSENTED_FULL → CONSENTED_PARTIAL → WITHDRAWN
+
+# ANTI-PATTERN 3: Ranked list instead of probability field
+# WRONG — ranking implies "best person"; the architecture finds coverage
+def find_best_match(problem, signatures):
+    return sorted(signatures, key=lambda s: s.score, reverse=True)[0]
+# RIGHT — L3 returns a MatchField with three region types:
+#   COLLAPSED_POINT: one signature covers this geometry
+#   CONSTELLATION: multiple signatures needed together
+#   DARK_REGION: piece exists but not in known population
+
+# ANTI-PATTERN 4: Consensus-based validation
+# WRONG — peer review replaces consequence as referee
+def validate_solution_wrong(solution, reviewers):
+    votes = [r.approve(solution) for r in reviewers]
+    return sum(votes) / len(votes) > 0.5
+# RIGHT — L5 validates against physical outcome, not agreement
+#   "Did the cold chain hold?" not "Do experts agree it should?"
+
+# ANTI-PATTERN 5: Adding numpy/torch to spine/
+# WRONG — spine/ is pure stdlib for portability
+# from spine.l3_matching import torch  # NO — breaks core invariant
+# RIGHT — ML code belongs in Odd/ or a new top-level directory
+#   spine/ uses only: dataclasses, enum, typing, uuid, datetime, hashlib
+
+# ANTI-PATTERN 6: Self-report as signal source
+# WRONG — "I'm a visual thinker" is not behavioral evidence
+# sig.primary_mode = person.self_described_style
+# RIGHT — L1 extracts from observed behavior:
+#   "drew bridge forces before reading specs" → spatial_geometric
+#   "asked 'who checked the power supply?' unprompted" → felt_absence
+```
+
+### Example 10: Layer boundary data flow trace
+
+Data flows through defined structures between layers. No side channels.
+
+```python
+# L1 → L2: CognitiveSignatureVector
+# L1 outputs a consented, encrypted signature vector.
+# L2 never sees the signature — L2 decomposes the PROBLEM, not the person.
+
+# L2 → L3: ConstraintRequirementVector + ConstraintGeometryVector
+# L2 strips domain language from the problem and outputs pure geometry.
+# L3 receives the geometry and searches for cognitive fits.
+
+# L3 → L4: MatchField (containing ProbabilityRegions)
+# L3 does NOT output "assign person X to problem Y".
+# L3 outputs a probability field: regions of coverage, dark regions of gaps.
+# L4 receives the field and assembles collision spaces.
+
+# L4 → L5: Collision outcomes (what happened in the collision space)
+# L4 tracks CollisionDynamics: who spoke, what geometry emerged,
+# what recombinations were attempted, what pathologies appeared.
+# L5 receives outcomes and opens ConsequenceFields.
+
+# L5 → L1,L2,L3: Recalibration signals (surgical, per-record)
+# L5 does NOT send "the system was wrong" — it sends specific updates:
+#   → L1: "person_042 confidence on thermal knowledge: 0.9 → 0.75"
+#   → L2: "add failure condition to thermal_mass: sustained_heat_wave_>5_days"
+#   → L3: "reduce fit_score by 0.1 for sustained heat scenarios"
+
+# Data boundary enforcement:
+# - L1 signatures are encrypted; system cannot read without person's key
+# - L2 problems are domain-stripped; no field jargon crosses into matching
+# - L3 uses ConsentGate; only consented signatures enter the probability field
+# - L4 monitors for pathologies (ego dominance, credential crowding)
+# - L5 observations come from physical reality, not peer opinion
+
+# The consent gate is checked at EVERY layer boundary:
+# orchestrator.gate.can_match("person_042")       → checked by L3
+# orchestrator.gate.can_access("person_042", scope) → checked by L4
+# Withdrawal at L1 cascades: signature deleted from ALL downstream layers
+```
+
+### Example 11: Diversity enforcement — minimum_entropy_diversity
+
+The system cannot proceed if all matched signatures share the same blind spot.
+
+```python
+from spine.spine import (
+    CognitiveSignatureVector, CognitiveMode, ConstraintClass,
+    BlindSpotRecord, ConfidenceLevel
+)
+
+# minimum_entropy_diversity = 2 — at least 2 distinct cognitive modes required
+
+# Scenario: three engineers, all spatial_geometric
+sig_a = CognitiveSignatureVector(
+    person_id="eng_a",
+    primary_mode=CognitiveMode.SPATIAL_GEOMETRIC,
+    blind_spots=[BlindSpotRecord(
+        domain="institutional_politics",
+        reason="optimizes for physics, misses political constraints",
+        compensatory_architecture_needed="relational_network"
+    )],
+    # ...
+)
+sig_b = CognitiveSignatureVector(
+    person_id="eng_b",
+    primary_mode=CognitiveMode.SPATIAL_GEOMETRIC,
+    blind_spots=[BlindSpotRecord(
+        domain="institutional_politics",
+        reason="same blind spot as eng_a",
+        compensatory_architecture_needed="relational_network"
+    )],
+    # ...
+)
+
+# L3 checks: do matched signatures share the same blind spot?
+# If ALL signatures miss "institutional_politics" → entropy too low
+# The match field MUST include a constellation or dark region
+# pointing to the missing cognitive mode (relational_network)
+
+# This is why monoculture-sim.py exists — it demonstrates:
+# - Monoculture teams (all same mode): 27% failure rate
+# - Diverse teams (mixed modes): dramatically lower failure rate
+# - The diversity enforcement isn't political — it's structural
+#   Same reason bridges need both tension AND compression members
+
+# In L3's build_match_field():
+#   If all individual_fits share primary_domain →
+#     dark_region created for uncovered blind spots
+#     unexpected_required flag triggers probability mass shift
+#     away from same-domain collapsed points
+```
+
+### Example 12: Cold start bootstrapping
+
+First deployment has thin signature library. Here's how it bootstraps.
+
+```python
+from spine.spine import SystemRegistry, ConfidenceLevel
+from spine.l3_matching import MatchConfidence
+
+registry = SystemRegistry()
+
+# Cold start state:
+# - 1 confirmed signature (Kavik — spatial_geometric + embodied_consequence)
+# - Partial solution library seeded with 2 pieces (thermal mass, apprenticeship)
+# - No consequence observations yet
+
+# ConfidenceLevel.COLD_START triggers when:
+#   L3 coverage < 0.3 AND signature population < threshold
+# The system honestly reports: "I don't have enough data"
+
+# Bootstrap sequence:
+# 1. Seed known signatures from behavioral observation (not surveys)
+#    registry.register_signature(kavik_sig)  # sessions_observed=15, HIGH confidence
+#
+# 2. Run against known problem (Superior-Tomah cold chain)
+#    registry.register_problem(cold_chain_problem)
+#
+# 3. L3 builds match field — mostly DARK_REGION at cold start
+#    field.dark_region_fraction() → ~0.7 (70% unknown territory)
+#    field.confidence → COLD_START
+#
+# 4. Dark regions tell you WHERE to look:
+#    acquisition_domains=["ultrasonic_ndt", "fracture_mechanics"]
+#    acquisition_signature_types=["embodied_consequence_in_material_science"]
+#
+# 5. Each new signature + consequence observation improves the field
+#    After 5 signatures + 2 consequence observations:
+#      field.confidence → LOW or MEDIUM
+#      dark_region_fraction drops
+#
+# 6. Consequence feedback is the fastest bootstrap:
+#    One real grid failure event that the cold chain survives
+#    generates more recalibration signal than 50 new signatures
+
+# The cold start is honest, not hidden:
+# "I have one confirmed cognitive signature and two partial solutions.
+#  Here's what I can match. Here's what I can't see yet.
+#  Here's where to look for missing pieces."
+```
+
+### Example 13: Consequence recalibration propagation
+
+When L5 observes a physical outcome, recalibration propagates surgically through layers.
+
+```python
+from spine.l5_consequence_anchor import (
+    L5ConsequenceAnchor, ConsequenceObservation,
+    ConsequenceDimension, ConsequenceSignalStrength
+)
+from datetime import timedelta
+
+l5 = L5ConsequenceAnchor()
+collision_id = "superior_tomah_passive_cooling_001"
+l5.open_consequence_field(collision_id, "thermal_mass_plus_lora_mesh")
+
+# Physical reality sends signal: cold chain held 6hrs, but condensation problem
+obs_working = ConsequenceObservation(
+    collision_space_id=collision_id,
+    dimension=ConsequenceDimension.WORKING_NOW,
+    signal_strength=ConsequenceSignalStrength.CONFIRMED,
+    observed_value=0.85,
+    observed_description="Cold chain held through 6hr grid outage July heat",
+    conditions={"temperature_f": 94, "grid_status": "failed"},
+    time_since_intervention=timedelta(days=45),
+    observed_by="regional_food_hub_operator"
+)
+result = l5.record_observation(collision_id, obs_working)
+# result["overall_assessment"] → "working" (0.85 > 0.7 threshold)
+# No recalibration signals — solution is performing
+
+# But then: introduced problem appears
+obs_problem = ConsequenceObservation(
+    collision_space_id=collision_id,
+    dimension=ConsequenceDimension.INTRODUCED_PROBLEMS,
+    signal_strength=ConsequenceSignalStrength.CONFIRMED,
+    observed_value=0.4,
+    observed_description="Condensation creating moisture in adjacent storage",
+    new_problem_geometry="thermal_mass_condensation_adjacent_moisture_damage",
+    new_problem_severity=0.35,
+    time_since_intervention=timedelta(days=60),
+    observed_by="facility_manager"
+)
+result2 = l5.record_observation(collision_id, obs_problem)
+# NOW recalibration signals fire:
+# → L2: add_constraint_node "thermal_mass_condensation_adjacent_moisture_damage"
+#   (new geometry discovered — L2 library updated)
+
+# Missing piece visible under load
+obs_gap = ConsequenceObservation(
+    collision_space_id=collision_id,
+    dimension=ConsequenceDimension.MISSING_PIECES,
+    signal_strength=ConsequenceSignalStrength.CONFIRMED,
+    observed_value=0.6,
+    observed_description="Staff unsure of manual override protocol during outage",
+    gap_geometry="knowledge_transmission_incomplete_human_protocol_layer",
+    gap_description="human_protocol_for_manual_mode_not_transmitted",
+    time_since_intervention=timedelta(days=45),
+    observed_by="kavik"
+)
+result3 = l5.record_observation(collision_id, obs_gap)
+# Recalibration signals:
+# → L3: add_dark_region_target for knowledge_transmission gap
+# → L2: add_failure_condition "human_protocol_for_manual_mode_not_transmitted"
+
+# Early warning scan — precursor detection before full consequence
+warnings = l5.scan_early_warnings(collision_id, {
+    "design_conditions": {"temperature_f": 85},
+    "current_conditions": {"temperature_f": 94},
+    "system_stress_level": 0.65
+})
+# Returns: condition_drift_from_solution_design (temp 85→94)
+#          missing_piece_load_approaching (gap + stress 0.65)
+
+# Key principle: each signal updates ONLY the specific record that was wrong
+# "thermal mass condensation" → update thermal_mass partial solution edges
+# "manual protocol gap" → new dark region in L3, new failure condition in L2
+# NOT: "the whole approach was wrong" — that's consensus thinking, not consequence
+```
+
 ---
 
 ## Known Gaps & Limitations

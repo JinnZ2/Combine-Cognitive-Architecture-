@@ -189,6 +189,443 @@ The beginning of a real ML pipeline: synthetic training data generation, regex-b
 
 ---
 
+## Code Examples
+
+### Example 1: Full consent lifecycle (L1)
+
+The consent layer enforces extraction → disclosure → correction → consent as a state machine, not a checkbox.
+
+```python
+from spine.consent_layer import (
+    ConsentFlowOrchestrator, ConsentScope, ConsentState,
+    EncryptedSignature
+)
+from datetime import datetime
+import hashlib
+
+orchestrator = ConsentFlowOrchestrator()
+
+# 1. Begin extraction — person not yet told
+orchestrator.begin_extraction("person_042")
+# State: EXTRACTING — gate blocks all access
+
+# 2. Store encrypted signature — system cannot read it
+enc_sig = EncryptedSignature(
+    person_id="person_042",
+    encrypted_payload=b"encrypted_cognitive_signature",
+    encryption_timestamp=datetime.now(),
+    key_fingerprint=hashlib.sha256("persons_key".encode()).hexdigest(),
+    signal_count=5,
+    sessions_count=2,
+    confidence_level="MEDIUM"
+)
+orchestrator.store_encrypted_signature(enc_sig)
+# State: PENDING_DISCLOSURE — gate still blocks
+
+# 3. Generate disclosure — show person what was found in plain language
+disclosure = orchestrator.generate_disclosure("person_042")
+# State: DISCLOSED — person sees observed behaviors + inferred architecture
+# disclosure.observed_behaviors → list of what system saw
+# disclosure.inferred_architecture → what it inferred about cognitive mode
+# disclosure.known_extraction_limitations → honest about what it can't see
+
+# 4. Person corrects misreadings
+orchestrator.process_correction("person_042", {
+    "field": "primary_mode",
+    "original": "spatial_geometric",
+    "corrected": "embodied_consequence",
+    "reason": "I think in muscle memory not diagrams"
+})
+# State: CORRECTING
+
+# 5. Grant granular consent — not all-or-nothing
+orchestrator.grant_consent("person_042", [
+    ConsentScope.MATCHING_PROBLEMS,      # yes match me to problems
+    ConsentScope.COLLISION_SPACES,       # yes put me in collision spaces
+    # NOT ConsentScope.RESEARCH          # no research use
+])
+# State: CONSENTED_PARTIAL — gate now allows matching + collision
+
+# 6. Check access through gate — every layer must call this
+assert orchestrator.gate.can_match("person_042")           # True
+assert not orchestrator.gate.can_access(                   # False
+    "person_042", ConsentScope.RESEARCH
+)
+
+# 7. Withdrawal at any time — triggers actual deletion
+orchestrator.process_withdrawal("person_042")
+# State: WITHDRAWN — signature deleted from all layers
+assert not orchestrator.gate.can_match("person_042")       # False
+assert "person_042" not in orchestrator.encrypted_signatures  # Gone
+```
+
+### Example 2: Building a constraint geometry (L2)
+
+Domain stripping: express problems as constraint geometry, not field language.
+
+```python
+from spine.l2_constraint_geometry import (
+    ConstraintNode, ConstraintScale, PartialSolution,
+    RecombinationInterface, InterfaceType,
+    SolutionOrigin
+)
+
+# Strip domain surface from the problem:
+# NOT: "Rural bridge in Wisconsin is failing"
+# IS: pure constraint geometry
+bridge_constraints = [
+    ConstraintNode(
+        constraint_description="single_load_path_no_redundancy",
+        domain_stripped="single point of failure — all load on one path",
+        pure_geometry="single_point_failure",
+        scale=ConstraintScale.MACRO,
+        failure_mode="total_collapse_on_single_member_loss",
+        cascade_potential=0.95
+    ),
+    ConstraintNode(
+        constraint_description="invisible_internal_corrosion",
+        domain_stripped="failure mode invisible to standard inspection",
+        pure_geometry="invisible_internal_stress",
+        scale=ConstraintScale.MICRO,
+        failure_mode="eyebar_chain_internal_fracture",
+        cascade_potential=0.9
+    ),
+    ConstraintNode(
+        constraint_description="council_veto_funding",
+        domain_stripped="resource gatekeeper with different optimization target",
+        pure_geometry="deadlock_refusal",
+        scale=ConstraintScale.MESO,
+        failure_mode="needed_intervention_blocked_by_budget_frame",
+        cascade_potential=0.7
+    ),
+]
+
+# Partial solutions connect via interfaces (negative space)
+passive_cooling = PartialSolution(
+    name="thermal_mass_spike_absorption",
+    solves_geometry="buffer_absence — absorbs thermal spikes without electrical input",
+    origin=SolutionOrigin.TRADITIONAL_KNOWLEDGE,
+    origin_domain="stone barn construction — Upper Midwest",
+    origin_context="pre-electrical food preservation",
+    held_by_cognitive_mode=["embodied_consequence", "temporal_rhythmic"],
+    interfaces=[
+        RecombinationInterface(
+            interface_type=InterfaceType.COMPLEMENTARY,
+            # What this piece CANNOT do — shape of its absence
+            negative_space=[
+                "cannot_distribute_over_network",
+                "cannot_signal_failure_remotely",
+                "requires_physical_mass_cannot_digitize"
+            ],
+            # What fits into this absence
+            complementary_requirements=[
+                "mesh_communication_for_monitoring",
+                "sensor_layer_for_temperature",
+                "logistics_for_physical_mass_placement"
+            ],
+        )
+    ],
+    evidence_of_working=["stone_barns_held_temperature_for_centuries"],
+    failure_conditions=["mass_insufficient_for_spike_magnitude"]
+)
+
+# Check interface compatibility between two partial solutions
+lora_mesh = PartialSolution(
+    name="resilient_mesh_communication",
+    solves_geometry="communication_without_grid — sensor data over LoRa mesh",
+    origin=SolutionOrigin.ADJACENT_DOMAIN,
+    origin_domain="IoT sensor networks",
+    interfaces=[
+        RecombinationInterface(
+            interface_type=InterfaceType.COMPLEMENTARY,
+            negative_space=[
+                "mesh_communication_for_monitoring",
+                "sensor_layer_for_temperature"
+            ],
+            complementary_requirements=[
+                "cannot_distribute_over_network",
+                "physical_infrastructure_to_monitor"
+            ],
+        )
+    ]
+)
+
+fit_score = passive_cooling.interface_compatibility(lora_mesh)
+# Returns 0-1: how well these pieces' negative spaces complement each other
+```
+
+### Example 3: Probability field matching (L3)
+
+L3 produces a probability field, not a ranked list. Three region types: collapsed point, constellation, dark region.
+
+```python
+from spine.l3_matching import (
+    ProbabilityRegion, RegionType, MatchField, MatchConfidence,
+    CognitiveSignatureRecord, GeometryFitCalculator
+)
+
+# A cognitive signature — extracted from behavior, not self-report
+kavik = CognitiveSignatureRecord(
+    signature_id="sig_001",
+    person_id="kavik",
+    primary_representation="spatial_geometric",
+    processing_style="isomorphism_detection",
+    grounding="embodied_consequence",
+    abstraction_direction="bottom_up",
+    domain_transfer="high",
+    validation_requirement="consequence_not_consensus",
+    strong_geometry_matches=[
+        "single_point_failure", "cascade_propagation",
+        "buffer_absence", "frame_failure"
+    ],
+    known_blind_spots=["relational_ceremonial_harm", "institutional_politics"],
+    complementary_signatures=["social_arbitrator", "relational_network"],
+    sessions_observed=15
+)
+
+# The match field shows WHERE solutions likely exist
+field = MatchField(confidence=MatchConfidence.MEDIUM)
+
+# Region 1: Collapsed point — one signature covers this component
+field.regions.append(ProbabilityRegion(
+    region_type=RegionType.COLLAPSED_POINT,
+    probability_density=0.85,
+    signature_ids=["kavik"],
+    constraints_covered=["single_point_failure", "cascade_propagation"],
+    reasoning="isomorphism detection + embodied consequence covers physics geometry"
+))
+
+# Region 2: Constellation — multiple signatures needed together
+field.regions.append(ProbabilityRegion(
+    region_type=RegionType.CONSTELLATION,
+    probability_density=0.6,
+    signature_ids=["kavik", "chief_social_arbitrator"],
+    constraints_covered=["deadlock_refusal"],
+    recombination_potential=0.75,
+    collision_space_required=True,
+    reasoning="physics person + social arbitrator needed for council veto geometry"
+))
+
+# Region 3: Dark region — piece exists but not in known population
+field.regions.append(ProbabilityRegion(
+    region_type=RegionType.DARK_REGION,
+    probability_density=0.3,
+    constraints_covered=[],
+    constraints_uncovered=["invisible_internal_stress"],
+    acquisition_domains=["ultrasonic_ndt", "fracture_mechanics"],
+    acquisition_signature_types=["embodied_consequence_in_material_science"],
+    reasoning="need someone who has physically felt material failure — not just modeled it"
+))
+
+field.normalize()
+# coverage() → fraction of constraint geometry with probability mass
+# dark_region_fraction() → how much is unknown territory
+```
+
+### Example 4: Consequence observation and surgical recalibration (L5)
+
+Consequence is not binary. Six dimensions, each updating independently.
+
+```python
+from spine.l5_consequence_anchor import (
+    ConsequenceObservation, ConsequenceDimension,
+    ConsequenceSignalStrength, DimensionTracker,
+    RecalibrationTarget
+)
+from datetime import datetime, timedelta
+
+# Track "working now" dimension for a collision outcome
+tracker = DimensionTracker(
+    dimension=ConsequenceDimension.WORKING_NOW,
+    collision_id="collision_bridge_042"
+)
+
+# Observation 1: Day 3 — cold chain holding
+tracker.add_observation(ConsequenceObservation(
+    collision_space_id="collision_bridge_042",
+    dimension=ConsequenceDimension.WORKING_NOW,
+    signal_strength=ConsequenceSignalStrength.CONFIRMED,
+    observed_value=0.9,
+    observed_description="cold chain temperature within bounds for 72 hours",
+    conditions={"ambient_temp": 34, "grid_status": "failed"},
+    time_since_intervention=timedelta(days=3),
+    observed_by="automated_sensor"
+))
+
+# Observation 2: Day 14 — still holding but showing edge
+tracker.add_observation(ConsequenceObservation(
+    collision_space_id="collision_bridge_042",
+    dimension=ConsequenceDimension.WORKING_NOW,
+    signal_strength=ConsequenceSignalStrength.CONFIRMED,
+    observed_value=0.75,
+    observed_description="holding but thermal mass approaching saturation on day 12",
+    conditions={"ambient_temp": 38, "grid_status": "failed", "heat_wave": True},
+    time_since_intervention=timedelta(days=14),
+    observed_by="person_field_observer"
+))
+
+# tracker.current_estimate → recency-weighted estimate (0-1)
+# tracker.trend → "degrading" (two observations, second lower)
+# tracker.confidence → observation_count / 10.0
+
+# Counterfactual observation — absence of expected failure
+avoidance_obs = ConsequenceObservation(
+    collision_space_id="collision_bridge_042",
+    dimension=ConsequenceDimension.AVOIDANCE,
+    signal_strength=ConsequenceSignalStrength.COUNTERFACTUAL,
+    observed_value=0.85,
+    observed_description="expected 27% failure rate for monoculture team; did not occur",
+    counterfactual_failure_mode="food_spoilage_cascade_in_grid_failure",
+    counterfactual_confidence=0.7  # hard to measure absence
+)
+
+# Surgical recalibration — update ONLY the specific relationship that failed
+# NOT: "the whole system was wrong"
+# IS: "this piece underfit this geometry under these conditions"
+# Target: L3 fit score for kavik's signature on thermal geometry
+# Target: L2 geometry tags on passive_cooling partial solution
+```
+
+### Example 5: End-to-end pipeline flow (using spine.py registry)
+
+```python
+from spine.spine import (
+    SystemRegistry, CognitiveSignatureVector, CognitiveMode,
+    ConstraintClass, ConfidenceLevel, SensorReading,
+    BlindSpotRecord, ConstraintRequirementVector,
+    InvisibleVariable, VetoWindow, ConsequenceRecord,
+    ValidationStatus
+)
+from datetime import datetime
+
+registry = SystemRegistry()
+
+# L1 → Register a consented signature
+sig = CognitiveSignatureVector(
+    person_id="person_042",
+    extraction_timestamp=datetime.now(),
+    primary_mode=CognitiveMode.SPATIAL_GEOMETRIC,
+    secondary_modes=[CognitiveMode.EMBODIED_CONSEQUENCE],
+    strong_signals=["constraint_coupling", "felt_absence"],
+    weak_signals=["social_arbitration"],
+    blind_spots=[BlindSpotRecord(
+        domain="institutional_politics",
+        reason="optimizes for physics, misses political constraints",
+        acknowledged_by_person=True,
+        compensatory_architecture_needed="relational_network"
+    )],
+    sensor_readings=[
+        SensorReading(
+            signal_type="entry_point",
+            observed_behavior="entered problem spatially — 3D constraint map",
+            inferred_meaning="spatial_geometric primary mode",
+            confidence=0.92,
+            raw_evidence="drew bridge forces before reading specs"
+        ),
+        SensorReading(
+            signal_type="felt_absence",
+            observed_behavior="asked 'who checked the power supply?' unprompted",
+            inferred_meaning="detects missing variables without being told",
+            confidence=0.88,
+            raw_evidence="question came before failure mode was mentioned"
+        ),
+        SensorReading(
+            signal_type="self_recalibration",
+            observed_behavior="caught own bias in ceremonial knowledge scenario",
+            inferred_meaning="validates against consequence not ego",
+            confidence=0.95,
+            raw_evidence="said 'wait, I'm applying my frame wrong here'"
+        ),
+    ],
+    detects_well=[ConstraintClass.CASCADE_PREVENTION, ConstraintClass.FRAME_FAILURE],
+    misses_consistently=[ConstraintClass.SOCIAL_STRUCTURE],
+    validation_requirement="physical_outcome_not_peer_approval",
+    consensus_independence=0.87,
+    confidence=ConfidenceLevel.HIGH,
+    signal_count=15,
+    sessions_observed=5,
+    extraction_consented=True,
+    matching_consented=True   # consent granted — signature is matchable
+)
+
+registry.register_signature(sig)
+assert sig.is_matchable()  # True — consented + enough signals
+
+# L2 → Register a problem
+problem = ConstraintRequirementVector(
+    problem_id="prob_cold_chain_001",
+    problem_description="Superior-Tomah corridor cold chain resilience",
+    decomposition_timestamp=datetime.now(),
+    primary_constraint_class=ConstraintClass.CASCADE_PREVENTION,
+    secondary_constraint_classes=[
+        ConstraintClass.KNOWLEDGE_GAP,
+        ConstraintClass.THERMODYNAMIC_ALLOCATION
+    ],
+    required_modes=[
+        CognitiveMode.EMBODIED_CONSEQUENCE,
+        CognitiveMode.TEMPORAL_RHYTHMIC
+    ],
+    beneficial_modes=[CognitiveMode.RELATIONAL_NETWORK],
+    dangerous_modes=[CognitiveMode.VERBAL_SEQUENTIAL],  # might over-formalize
+    invisible_variables=[InvisibleVariable(
+        variable_name="elder_knowledge_holder_health",
+        why_missing="not in any database — embodied knowledge",
+        where_to_find="field observation in corridor",
+        consequence_if_ignored="knowledge dies with holder",
+        detectable_by=[CognitiveMode.RELATIONAL_NETWORK]
+    )],
+    transmission_modality="seasonal_presence",
+    veto_windows=[VetoWindow(
+        window_id="vw_001",
+        closes_year=2031,
+        current_year=2026,
+        years_remaining=5,
+        consequence_if_missed="passive cooling knowledge lost permanently",
+        intervention_required="field documentation + apprenticeship pipeline"
+    )],
+    timeline_urgency="years",
+    how_to_validate="cold chain holds through grid failure event",
+    validation_timeline="next grid stress event",
+    frame_vulnerabilities=["could be framed as 'just buy generators'"],
+    manufactured_consequence_risk=0.1
+)
+
+registry.register_problem(problem)
+
+# L3 → Get matchable signatures for uncovered problems
+matchable = registry.get_matchable_signatures()  # only consented + enough signal
+uncovered = registry.get_uncovered_problems()     # problems not yet in collision spaces
+
+# L5 → Consequence arrives — recalibrate surgically
+consequence = ConsequenceRecord(
+    record_id="cr_001",
+    collision_id="collision_042",
+    timestamp=datetime.now(),
+    predicted_outcome="cold chain holds 14 days without grid",
+    prediction_confidence=0.8,
+    physical_outcome="cold chain held 11 days, failed day 12 — thermal mass saturated",
+    outcome_timestamp=datetime.now(),
+    prediction_accurate=False,
+    accuracy_details="duration overestimated — heat wave exceeded thermal mass capacity",
+    l1_recalibration_signal={
+        "person_042": "confidence_on_thermal_mass_knowledge: 0.9 → 0.75"
+    },
+    l2_recalibration_signal={
+        "thermal_mass_spike_absorption": "add_failure_condition: sustained_heat_wave_>5_days"
+    },
+    l3_recalibration_signal={
+        "fit_score_thermal": "reduce by 0.1 for sustained heat scenarios"
+    },
+    validation_status=ValidationStatus.PARTIALLY_VALIDATED
+)
+
+recalibration = registry.consequence_feedback(consequence)
+# Returns layer-specific signals — each layer updates its own records
+# Physics won. Not consensus. The cold chain told us what's true.
+```
+
+---
+
 ## Known Gaps & Limitations
 
 ### Technical Gaps (Need Implementation)

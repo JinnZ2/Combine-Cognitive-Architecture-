@@ -31,13 +31,20 @@ Combine-Cognitive-Architecture-/
 │   ├── l4_collision_space.py          ← L4: Collision facilitation
 │   └── l5_consequence_anchor.py       ← L5: Consequence validation + recalibration
 │
-├── Odd/                               ← Production derivatives and experiments
-│   ├── Monty-Carlo.py                 ← Monte Carlo risk simulation (~10K lines)
-│   ├── trading-desk.py                ← HFT cognitive futures trading (~11K lines)
-│   └── DeepSeek/
-│       ├── training-set.json          ← Synthetic training data for cognitive styles
-│       ├── L1.py                      ← Production L1 extraction API
-│       └── Hugging-face.py            ← Gradio Space deployment
+├── Odd/                               ← Exploratory production derivatives (experimental)
+│   │                                     Named for "odd lots" — unconventional applications
+│   │                                     of the core architecture. Large standalone files,
+│   │                                     each self-contained with its own class hierarchy.
+│   ├── Monty-Carlo.py                 ← Monte Carlo cognitive risk bond portfolio (~10K lines)
+│   │                                     10K simulations, correlation matrices between cognitive
+│   │                                     modes, loss distributions. Requires: numpy, matplotlib
+│   ├── trading-desk.py                ← HFT cognitive futures trading desk (~11K lines)
+│   │                                     Futures contracts on cognitive modes (CC, FA, PM, SA),
+│   │                                     CDI index, signal decay rates. Requires: numpy, plotly
+│   └── DeepSeek/                      ← ML pipeline for cognitive signature classification
+│       ├── training-set.json          ← Synthetic training data for 5 cognitive styles
+│       ├── L1.py                      ← Production L1 extraction API (regex-based)
+│       └── Hugging-face.py            ← Gradio Space deployment (fine-tuned BERT)
 │
 ├── sim.py                             ← Live bridge scenario demo
 ├── monoculture-sim.py                 ← Corporate monoculture failure simulation
@@ -88,6 +95,25 @@ All layers build on **consequence as final referee**, not consensus.
 
 ---
 
+## Tooling Status
+
+This project has **no formal tooling infrastructure yet**:
+- No package manager (no `requirements.txt`, `pyproject.toml`, or `setup.py`)
+- No test framework or test suite — validation is done through simulators (`sim.py`, `monoculture-sim.py`)
+- No linter or formatter configuration
+- No CI/CD pipeline
+- No Makefile or build system
+
+Dependencies are implicit in imports. Core `spine/` uses only stdlib. Peripherals need:
+- `numpy`, `matplotlib` — simulations and plotting
+- `torch`, `transformers` — Hugging Face ML pipeline
+- `gradio` — web UI deployment
+- `plotly` — trading desk visualization
+
+When tooling is added, update this section.
+
+---
+
 ## Development Conventions
 
 ### Code Style
@@ -96,6 +122,7 @@ All layers build on **consequence as final referee**, not consensus.
 - **IDs:** UUID4 for all entities
 - **Timestamps:** `datetime.now()` for temporal records
 - **No external frameworks** in core — pure Python for portability
+- **File organization:** spine/ layers are self-contained modules; top-level scripts are standalone demos; Odd/ files are large self-contained applications with their own class hierarchies
 
 ### Privacy & Consent Rules (Non-Negotiable)
 - No PII in cognitive signatures — behavioral signals only
@@ -142,7 +169,23 @@ python Odd/trading-desk.py
 python Odd/DeepSeek/Hugging-face.py
 ```
 
-### No formal test suite exists yet. Validation is done through simulators and consequence observation.
+### No formal test suite exists. Validation is through simulators and consequence observation.
+
+---
+
+## Codebase Patterns to Know
+
+### spine/ — The Core (Read This First)
+Each layer file (L1–L5) follows the same pattern: enums defining the layer's domain, dataclasses for state, and a main class implementing the layer logic. They're designed to compose as a pipeline but each can be read standalone. `spine.py` holds the shared data structures all layers import from.
+
+### Top-level scripts — Demos and Products
+`sim.py` and `monoculture-sim.py` are runnable demonstrations. `insurance-risk.py` and `actuarial-table.py` are product concepts (cognitive diversity insurance). All are self-contained single-file scripts.
+
+### Odd/ — Experimental Production Derivatives
+These are large (10K+ lines), self-contained applications that apply the core architecture to specific domains (finance, risk modeling, ML). Each has its own class hierarchy and doesn't import from `spine/`. Treat them as independent applications that share the conceptual architecture but not the code.
+
+### Odd/DeepSeek/ — ML Pipeline
+The beginning of a real ML pipeline: synthetic training data generation, regex-based extraction as baseline, and a Gradio UI for deployment. This is where L1's "needs ML extraction model" gap is being worked on.
 
 ---
 
@@ -185,6 +228,31 @@ Feed back: which pieces fit, which didn't, what new geometry emerged, what was m
 
 ### Recording Consequence Observations
 Record against the collision that produced the outcome. Include dimension (working_now, avoidance, lifespan, introduced_problems, partial_success, missing_pieces) and signal strength.
+
+---
+
+## Guidance for AI Assistants
+
+### Do
+- Read `spine/README.md` before modifying any layer — it documents the design intent and known gaps
+- Preserve the 5-layer pipeline boundary — layers communicate through defined data structures, not side channels
+- Use constraint geometry language in code comments and documentation
+- Keep `spine/` free of external dependencies — stdlib only
+- Treat the consent state machine as security-critical code
+- When adding features, ask: does this anchor to physical consequence or to consensus?
+
+### Don't
+- Don't collapse the consent state machine into a boolean — the 8 states exist for a reason
+- Don't add credential-based matching or filtering anywhere — this is architecturally excluded
+- Don't merge Odd/ files back into spine/ — they're intentionally separate applications
+- Don't add validation that checks credentials, titles, or institutional affiliation
+- Don't "improve" the architecture by replacing consequence anchoring with peer review or voting
+- Don't add dependencies to spine/ — if you need numpy or ML libraries, that code belongs in Odd/ or a new directory
+
+### Watch Out For
+- The production encryption gap in L1 is real — `consent_layer.py` uses a structural placeholder. Any code that touches real user data needs this fixed first
+- `Odd/Monty-Carlo.py` and `Odd/trading-desk.py` are 10K+ lines each — read selectively, not in full
+- The README.md contains raw working notes at the bottom (L0 signal gradient, thermal limit notes) — these are design exploration, not spec
 
 ---
 

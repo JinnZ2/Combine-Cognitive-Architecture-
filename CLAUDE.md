@@ -1111,3 +1111,17 @@ Record against the collision that produced the outcome. Include dimension (worki
 The immediate test case is the **Superior-Tomah corridor** in the Upper Midwest — 280,000 people, food distribution infrastructure, passive cooling knowledge held by ~7 identified knowledge holders, policy window **2026–2031**.
 
 The cold chain needs to hold when the grid fails. That's the ground truth everything recalibrates toward.
+
+<!-- clone-refspec-note v1 -->
+## Cloning and pushing
+Shallow clones are single-branch by default.
+Before pushing any branch other than main, run:
+
+    git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    git fetch --depth 1
+
+Or clone with: git clone --depth 1 --no-single-branch <url>
+Without this, the first push of a new branch
+fails the tracking-ref check even when the
+commit landed.
+<!-- /clone-refspec-note v1 -->

@@ -64,3 +64,11 @@ Mainly AIs picking up the corpus cold, and humans curious enough to read
 it. These instructions and the CC0 corpus are free to use under CC0; no
 credit is needed. Keeping the reading instructions attached when copying
 is the one request, not an additional license condition.
+
+## In this repo
+
+`Odd/DeepSeek/Hugging-face.py` contains an embedded Hugging Face Space README
+template whose metadata sets `license: mit` for the generated Space. Preserve
+that distinct deployment declaration; it does not change the repository's
+CC0 declarations or establish the generated artifact's terms beyond that
+metadata.

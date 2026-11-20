@@ -665,7 +665,7 @@ class L3MatchingEngine:
     def _seed_signatures(self):
         """Seed with known cognitive signatures"""
 
-        # Kavik signature (confirmed, consented)
+        # JinnZ2 signature (confirmed, consented)
         kavik = CognitiveSignatureRecord(
             signature_id="sig_kavik_001",
             person_id="kavik",
@@ -775,7 +775,7 @@ def validate_l3():
 
     from consent_layer import ConsentRecord, ConsentScope, ConsentState
 
-    # Build minimal consent gate with Kavik consented
+    # Build minimal consent gate with JinnZ2 consented
     records = {
         "kavik": ConsentRecord(person_id="kavik")
     }

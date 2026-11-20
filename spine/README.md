@@ -130,7 +130,7 @@ When `unexpected_architecture_required` is flagged (life critical + expected sol
 - ML model for cognitive signature extraction (currently manual seeding)
 - Semantic constraint geometry matching (currently structural pattern matching)
 - Latent piece detection — finding people who hold a piece but don’t know they hold it
-- Population is currently one confirmed signature (Kavik). Cold start is real but less cold than it looks — Superior-Tomah corridor is already partially populated.
+- Population is currently one confirmed signature (JinnZ2). Cold start is real but less cold than it looks — Superior-Tomah corridor is already partially populated.
 
 -----
 

@@ -920,7 +920,7 @@ from spine.l3_matching import MatchConfidence
 registry = SystemRegistry()
 
 # Cold start state:
-# - 1 confirmed signature (Kavik — spatial_geometric + embodied_consequence)
+# - 1 confirmed signature (one reader — spatial_geometric + embodied_consequence)
 # - Partial solution library seeded with 2 pieces (thermal mass, apprenticeship)
 # - No consequence observations yet
 
@@ -1047,7 +1047,7 @@ warnings = l5.scan_early_warnings(collision_id, {
 3. **Production encryption** — Structural placeholder only; needs RSA/ECC before real deployment
 4. **Collision sensor layer** — Manual input; needs real behavioral sensors per medium
 5. **Consequence automation** — Manual entry; needs sensor integration (grid, cold chain, supply chain)
-6. **Cold start** — First user sees thin library; one confirmed signature (Kavik)
+6. **Cold start** — First user sees thin library; one confirmed signature (JinnZ2)
 
 ### Structural Gaps (Open Research)
 1. **Latent piece detection** — Finding people who hold pieces but don't know they're relevant

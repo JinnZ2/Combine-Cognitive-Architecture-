@@ -920,7 +920,7 @@ from spine.l3_matching import MatchConfidence
 registry = SystemRegistry()
 
 # Cold start state:
-# - 1 confirmed signature (one reader — spatial_geometric + embodied_consequence)
+# - 1 confirmed signature (spatial_geometric + embodied_consequence)
 # - Partial solution library seeded with 2 pieces (thermal mass, apprenticeship)
 # - No consequence observations yet
 
